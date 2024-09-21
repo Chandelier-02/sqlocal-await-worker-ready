@@ -85,6 +85,7 @@ export class SQLocalProcessor {
 			this.destroy();
 		} finally {
 			await this.initMutex.unlock();
+			this.emitMessage({ type: 'ready' });
 		}
 	};
 

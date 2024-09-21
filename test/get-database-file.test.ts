@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SQLocal } from '../src/index.js';
+import { createSQLocal } from '../src/client.js';
 
 describe('getDatabaseFile', () => {
 	const fileName = 'get-database-file-test.sqlite3';
@@ -8,7 +8,7 @@ describe('getDatabaseFile', () => {
 	it('should return the requested database file', async () => {
 		for (let path of paths) {
 			const databasePath = [...path, fileName].join('/');
-			const { sql, getDatabaseFile } = new SQLocal(databasePath);
+			const { sql, getDatabaseFile } = await createSQLocal(databasePath);
 
 			await sql`CREATE TABLE nums (num REAL NOT NULL)`;
 			const file = await getDatabaseFile();
@@ -32,7 +32,7 @@ describe('getDatabaseFile', () => {
 	});
 
 	it('should not throw when requested database has not been created', async () => {
-		const { getDatabaseFile } = new SQLocal('blank.sqlite3');
+		const { getDatabaseFile } = await createSQLocal('blank.sqlite3');
 		await expect(getDatabaseFile()).resolves.not.toThrow();
 	});
 });

@@ -1,9 +1,9 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { SQLocal } from '../src/index.js';
+import { createSQLocal } from '../src/client.js';
 
-describe('init', () => {
+describe('init', async () => {
 	const databasePath = 'init-test.sqlite3';
-	const { sql } = new SQLocal({ databasePath });
+	const { sql } = await createSQLocal({ databasePath });
 
 	beforeEach(async () => {
 		await sql`CREATE TABLE nums (num INTEGER NOT NULL)`;
@@ -31,7 +31,7 @@ describe('init', () => {
 	});
 
 	it('should enable read-only mode', async () => {
-		const { sql, destroy } = new SQLocal({
+		const { sql, destroy } = await createSQLocal({
 			databasePath,
 			readOnly: true,
 		});

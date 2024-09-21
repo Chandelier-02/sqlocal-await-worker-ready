@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { SQLocal } from '../src/index.js';
+import { createSQLocal } from '../src/client.js';
 
-describe('getDatabaseInfo', () => {
-	const { sql, getDatabaseInfo } = new SQLocal(
+describe('getDatabaseInfo', async () => {
+	const { sql, getDatabaseInfo } = await createSQLocal(
 		'get-database-info-test.sqlite3'
 	);
 

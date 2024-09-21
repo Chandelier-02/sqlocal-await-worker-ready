@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { SQLocal } from '../src/index.js';
+import { createSQLocal } from '../src/client.js';
 
-describe('createScalarFunction', () => {
-	const { sql, createScalarFunction } = new SQLocal(
+describe('createScalarFunction', async () => {
+	const { sql, createScalarFunction } = await createSQLocal(
 		'create-scalar-function-test.sqlite3'
 	);
 

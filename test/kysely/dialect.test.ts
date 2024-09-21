@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Kysely, ParseJSONResultsPlugin } from 'kysely';
 import type { Generated } from 'kysely';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
-import { SQLocalKysely } from '../../src/kysely/index.js';
 import { sleep } from '../test-utils/sleep.js';
+import { createSQLocalKysely } from '../../src/kysely/client.js';
 
-describe('kysely dialect', () => {
-	const { dialect, transaction } = new SQLocalKysely(
+describe('kysely dialect', async () => {
+	const { dialect, transaction } = await createSQLocalKysely(
 		'kysely-dialect-test.sqlite3'
 	);
 	const db = new Kysely<DB>({

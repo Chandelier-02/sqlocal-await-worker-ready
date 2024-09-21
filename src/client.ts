@@ -21,12 +21,24 @@ import type {
 	TransactionMessage,
 	StatementInput,
 	Transaction,
+	ErrorMessage,
+	ReadyMessage,
 } from './types.js';
 import { sqlTag } from './lib/sql-tag.js';
 import { convertRowsToObjects } from './lib/convert-rows-to-objects.js';
 import { normalizeStatement } from './lib/normalize-statement.js';
 import { getQueryKey } from './lib/get-query-key.js';
 import { normalizeSql } from './lib/normalize-sql.js';
+
+export const createSQLocal = async (
+	config: string | ClientConfig
+): Promise<SQLocal> => {
+	const normalizedConfig =
+		typeof config === 'string' ? { databasePath: config } : config;
+	const sqlocal = new SQLocal(normalizedConfig);
+	await sqlocal.waitReady();
+	return sqlocal;
+};
 
 export class SQLocal {
 	protected config: ClientConfig;
@@ -41,6 +53,7 @@ export class SQLocal {
 			reject: (error: unknown) => void,
 		]
 	>();
+	protected workerReadyPromise: Promise<void>;
 
 	constructor(databasePath: string);
 	constructor(config: ClientConfig);
@@ -55,11 +68,35 @@ export class SQLocal {
 			this.worker.addEventListener('message', this.processMessageEvent);
 
 			this.proxy = coincident(this.worker) as WorkerProxy;
-			this.worker.postMessage({
-				type: 'config',
-				config: this.config,
-			} satisfies ConfigMessage);
+
+			this.workerReadyPromise = new Promise<void>((resolve, reject) => {
+				const listener = (event: MessageEvent<ReadyMessage | ErrorMessage>) => {
+					const message = event.data;
+					if (message.type === 'ready') {
+						this.worker?.removeEventListener('message', listener);
+						resolve(); // Resolve the workerReadyPromise when "ready" message is received
+					} else if (message.type === 'error') {
+						this.worker?.removeEventListener('message', listener);
+						reject(message.error);
+					}
+				};
+
+				this.worker?.addEventListener('message', listener);
+
+				this.worker?.postMessage({
+					type: 'config',
+					config: this.config,
+				} satisfies ConfigMessage);
+			});
+		} else {
+			this.workerReadyPromise = Promise.reject(
+				new Error('Web Workers are not supported in this environment.')
+			);
 		}
+	}
+
+	public async waitReady(): Promise<void> {
+		await this.workerReadyPromise;
 	}
 
 	protected processMessageEvent = (

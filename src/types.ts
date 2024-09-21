@@ -133,7 +133,8 @@ export type OutputMessage =
 	| ErrorMessage
 	| DataMessage
 	| CallbackMessage
-	| InfoMessage;
+	| InfoMessage
+	| ReadyMessage;
 export type SuccessMessage = {
 	type: 'success';
 	queryKey: QueryKey;
@@ -160,6 +161,9 @@ export type InfoMessage = {
 	type: 'info';
 	queryKey: QueryKey;
 	info: DatabaseInfo;
+};
+export type ReadyMessage = {
+	type: 'ready';
 };
 
 // User functions

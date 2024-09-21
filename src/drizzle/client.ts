@@ -1,7 +1,21 @@
 import { SQLocal } from '../index.js';
-import type { RawResultData, Sqlite3Method } from '../types.js';
+import type { ClientConfig, RawResultData, Sqlite3Method } from '../types.js';
+
+export const createSQLocalDrizzle = async (
+	config: string | ClientConfig
+): Promise<SQLocalDrizzle> => {
+	const normalizedConfig =
+		typeof config === 'string' ? { databasePath: config } : config;
+	const sqlocalDrizzle = new SQLocalDrizzle(normalizedConfig);
+	await sqlocalDrizzle.waitReady();
+	return sqlocalDrizzle;
+};
 
 export class SQLocalDrizzle extends SQLocal {
+	constructor(config: ClientConfig) {
+		super(config);
+	}
+
 	driver = async (
 		sql: string,
 		params: unknown[],

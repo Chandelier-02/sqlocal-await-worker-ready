@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { SQLocal } from '../src/index.js';
+import { createSQLocal } from '../src/client.js';
 
-describe('createCallbackFunction', () => {
-	const { sql, createCallbackFunction } = new SQLocal(
+describe('createCallbackFunction', async () => {
+	const { sql, createCallbackFunction } = await createSQLocal(
 		'create-callback-function-test.sqlite3'
 	);
 

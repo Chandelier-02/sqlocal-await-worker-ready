@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { SQLocalKysely } from '../../src/kysely/index.js';
 import { Kysely, Migrator } from 'kysely';
+import { createSQLocalKysely } from '../../src/kysely/client.js';
 
-describe('kysely migrations', () => {
+describe('kysely migrations', async () => {
 	const databasePath = 'kysely-migrations-test.sqlite3';
-	const { dialect } = new SQLocalKysely(databasePath);
+	const { dialect } = await createSQLocalKysely(databasePath);
 	const db = new Kysely({ dialect });
 
 	const migrator = new Migrator({

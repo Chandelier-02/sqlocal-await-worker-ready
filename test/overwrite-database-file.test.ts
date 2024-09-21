@@ -1,9 +1,9 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { SQLocal } from '../src/index.js';
+import { createSQLocal } from '../src/client.js';
 
 describe('overwriteDatabaseFile', async () => {
-	const db1 = new SQLocal('overwrite-test-db1.sqlite3');
-	const db2 = new SQLocal('overwrite-test-db2.sqlite3');
+	const db1 = await createSQLocal('overwrite-test-db1.sqlite3');
+	const db2 = await createSQLocal('overwrite-test-db2.sqlite3');
 
 	await db1.sql`CREATE TABLE letters (letter TEXT NOT NULL)`;
 	await db1.sql`INSERT INTO letters (letter) VALUES ('a'), ('b'), ('c')`;

@@ -6,9 +6,23 @@ import {
 } from 'kysely';
 import type { DatabaseConnection, Dialect, Driver, QueryResult } from 'kysely';
 import { SQLocal } from '../index.js';
-import type { Transaction } from '../types.js';
+import type { ClientConfig, Transaction } from '../types.js';
+
+export const createSQLocalKysely = async (
+	config: string | ClientConfig
+): Promise<SQLocalKysely> => {
+	const normalizedConfig =
+		typeof config === 'string' ? { databasePath: config } : config;
+	const sqlocalKysely = new SQLocalKysely(normalizedConfig);
+	await sqlocalKysely.waitReady();
+	return sqlocalKysely;
+};
 
 export class SQLocalKysely extends SQLocal {
+	constructor(config: ClientConfig) {
+		super(config);
+	}
+
 	dialect: Dialect = {
 		createAdapter: () => new SqliteAdapter(),
 		createDriver: () => new SQLocalKyselyDriver(this),
